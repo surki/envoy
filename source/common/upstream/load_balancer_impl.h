@@ -133,5 +133,19 @@ public:
   HostConstSharedPtr chooseHost(const LoadBalancerContext* context) override;
 };
 
+/**
+ * Implementation of LoadBalancer that performs "first" selection across the hosts in the cluster.
+ */
+class StandByLoadBalancer : public LoadBalancer, LoadBalancerBase {
+public:
+  StandByLoadBalancer(const HostSet& host_set, const HostSet* local_host_set_,
+                      ClusterStats& stats, Runtime::Loader& runtime,
+                      Runtime::RandomGenerator& random)
+    : LoadBalancerBase(host_set, local_host_set_, stats, runtime, random) {}
+
+  // Upstream::LoadBalancer
+  HostConstSharedPtr chooseHost(const LoadBalancerContext* context) override;
+};
+
 } // namespace Upstream
 } // namespace Envoy

@@ -304,5 +304,28 @@ HostConstSharedPtr RandomLoadBalancer::chooseHost(const LoadBalancerContext*) {
   return hosts_to_use[random_.random() % hosts_to_use.size()];
 }
 
+HostConstSharedPtr StandByLoadBalancer::chooseHost(const LoadBalancerContext*) {
+  const std::vector<HostSharedPtr>& hosts_to_use = hostsToUse();
+  if (hosts_to_use.empty()) {
+    return nullptr;
+  }
+
+  // TODO:
+  //  - host_to_use should be sorted by host id since name resolution is async
+  //  - max_connections should be read from host config
+  HostConstSharedPtr host_min_cx_active = hosts_to_use[0];
+  for (auto& host : hosts_to_use) {
+    if (host->stats().cx_active_.value() < 1024) {
+      return host;
+    }
+
+    if (host->stats().cx_active_.value() < host_min_cx_active->stats().cx_active_.value()) {
+      host_min_cx_active = host;
+    }
+  }
+
+  return host_min_cx_active;
+}
+
 } // namespace Upstream
 } // namespace Envoy

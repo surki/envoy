@@ -557,6 +557,11 @@ ClusterManagerImpl::ThreadLocalClusterManagerImpl::ClusterEntry::ClusterEntry(
         host_set_, parent.parent_.primary_clusters_.at(cluster->name()).cluster_));
     break;
   }
+  case LoadBalancerType::StandBy: {
+    lb_.reset(new StandByLoadBalancer(host_set_, parent.local_host_set_, cluster->stats(),
+                                      parent.parent_.runtime_, parent.parent_.random_));
+    break;
+  }
   }
 
   host_set_.addMemberUpdateCb([this](const std::vector<HostSharedPtr>&,

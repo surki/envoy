@@ -1411,7 +1411,7 @@ const std::string Json::Schema::CLUSTER_SCHEMA(R"EOF(
       },
       "lb_type" : {
         "type" : "string",
-        "enum" : ["round_robin", "least_request", "random", "ring_hash", "original_dst_lb"]
+        "enum" : ["round_robin", "least_request", "random", "ring_hash", "original_dst_lb", "standby"]
       },
       "hosts" : {
         "type" : "array",
@@ -1420,7 +1420,16 @@ const std::string Json::Schema::CLUSTER_SCHEMA(R"EOF(
         "items" : {
           "type" : "object",
           "properties" : {
-            "url" : {"type" : "string"}
+            "url" : {"type" : "string"},
+            "max_connections" : {
+              "type" : "integer",
+              "minimum" : 0,
+              "exclusiveMinimum" : true
+            },
+            "id" : {
+              "type" : "integer",
+              "minimum" : 0
+            }
           },
           "required" : ["url"],
           "additionalProperties" : false

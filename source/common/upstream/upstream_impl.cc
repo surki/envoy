@@ -113,6 +113,9 @@ ClusterInfoImpl::ClusterInfoImpl(const envoy::api::v2::Cluster& config,
     }
     lb_type_ = LoadBalancerType::OriginalDst;
     break;
+  case envoy::api::v2::Cluster::STANDBY:
+    lb_type_ = LoadBalancerType::StandBy;
+    break;
   default:
     NOT_REACHED;
   }

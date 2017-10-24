@@ -93,6 +93,8 @@ void CdsJson::translateCluster(const Json::Object& json_cluster,
                    [](const Json::ObjectSharedPtr& host) {
                      envoy::api::v2::Address address;
                      AddressJson::translateAddress(host->getString("url"), true, false, address);
+                     address.set_id(host->getInteger("id"));
+                     address.set_max_connections(host->getInteger("max_connections"));
                      return address;
                    });
   };
@@ -104,6 +106,8 @@ void CdsJson::translateCluster(const Json::Object& json_cluster,
                    [](const Json::ObjectSharedPtr& host) {
                      envoy::api::v2::Address address;
                      AddressJson::translateAddress(host->getString("url"), true, true, address);
+                     address.set_id(host->getInteger("id"));
+                     address.set_max_connections(host->getInteger("max_connections"));
                      return address;
                    });
   } else if (string_type == "strict_dns") {
@@ -137,9 +141,12 @@ void CdsJson::translateCluster(const Json::Object& json_cluster,
     cluster.set_lb_policy(envoy::api::v2::Cluster::RANDOM);
   } else if (lb_type == "original_dst_lb") {
     cluster.set_lb_policy(envoy::api::v2::Cluster::ORIGINAL_DST_LB);
-  } else {
+  } else if (lb_type == "ring_hash") {
     ASSERT(lb_type == "ring_hash");
     cluster.set_lb_policy(envoy::api::v2::Cluster::RING_HASH);
+  } else {
+    ASSERT(lb_type == "standby");
+    cluster.set_lb_policy(envoy::api::v2::Cluster::STANDBY);
   }
 
   if (json_cluster.hasObject("health_check")) {
